@@ -7,7 +7,15 @@ import Swal from "sweetalert2";
 import "./Playlist.css";
 
 function Playlist(props) {
-  const { token, searchResult, playlistName, handlePlaylistName, handleSearch, handleTracks } = props.data;
+  console.log(props.data);
+  const {
+    token,
+    searchResult,
+    playlistName,
+    handlePlaylistName,
+    handleSearch,
+    handleTracks,
+  } = props.data;
 
   useEffect(() => {
     const headers = {
@@ -20,22 +28,24 @@ function Playlist(props) {
 
     axios
       .get("https://api.spotify.com/v1/me/top/tracks?limit=15", headers)
-      .then((response) => {
+      .then(response => {
         const newTracks = response.data.items;
-        handleSearch(newTracks.filter((track) => track.preview_url !== null));
+        handleSearch(newTracks.filter(track => track.preview_url !== null));
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
     // eslint-disable-next-line
   }, []);
 
-  const changePlaylistName = (e) => {
+  const changePlaylistName = e => {
     handlePlaylistName(e.target.value);
   };
 
-  const removeTrack = (idx) => {
-    const newTracks = searchResult.filter((track) => searchResult.indexOf(track) !== idx);
+  const removeTrack = idx => {
+    const newTracks = searchResult.filter(
+      track => searchResult.indexOf(track) !== idx
+    );
     handleSearch(newTracks, { clearTracks: true });
   };
 
@@ -55,7 +65,7 @@ function Playlist(props) {
     };
 
     const trackURIs = searchResult
-      .map((result) => result.uri)
+      .map(result => result.uri)
       .join("%2C")
       .split(":")
       .join("%3A");
@@ -64,23 +74,37 @@ function Playlist(props) {
 
     try {
       if (!playlistName) throw new Error("Playlist name cannot be empty.");
-      await axios.get("https://api.spotify.com/v1/me", headers).then((response) => {
-        userId = response.data.id;
-      });
-
-      await axios.post(`https://api.spotify.com/v1/users/${userId}/playlists`, requestBody, headers).then((response) => {
-        playlistId = response.data.id;
-      });
-
-      await axios.post(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?uris=${trackURIs}`, {}, headers).then((response) => {
-        Swal.fire({
-          icon: "success",
-          title: "Playlist Saved",
-          text: "Check it out on Spotify!",
-          showConfirmButton: false,
-          timer: 1500,
+      await axios
+        .get("https://api.spotify.com/v1/me", headers)
+        .then(response => {
+          userId = response.data.id;
         });
-      });
+
+      await axios
+        .post(
+          `https://api.spotify.com/v1/users/${userId}/playlists`,
+          requestBody,
+          headers
+        )
+        .then(response => {
+          playlistId = response.data.id;
+        });
+
+      await axios
+        .post(
+          `https://api.spotify.com/v1/playlists/${playlistId}/tracks?uris=${trackURIs}`,
+          {},
+          headers
+        )
+        .then(response => {
+          Swal.fire({
+            icon: "success",
+            title: "Playlist Saved",
+            text: "Check it out on Spotify!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        });
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -99,7 +123,11 @@ function Playlist(props) {
   return (
     <section className="playlist-container">
       <header className="playlist-header">
-        <input onChange={changePlaylistName} value={playlistName} placeholder="Playlist Name..." />
+        <input
+          onChange={changePlaylistName}
+          value={playlistName}
+          placeholder="Playlist Name..."
+        />
         <div className="button-wrapper">
           <Button
             onClick={handleSave}

@@ -29,13 +29,14 @@ export default function SearchBar(props) {
         `https://api.spotify.com/v1/search?q=${query}&type=track%2Cartist&limit=8`,
         headers
       )
-      .then((response) => {
+      .then(response => {
         let data = response.data.artists.items.concat(
           response.data.tracks.items
         );
+        console.log(data);
         setSearchResult(data);
       })
-      .catch((err) => console.log(err));
+      .catch(err => console.log(err));
   }
 
   function handleTxtChange(_, newValue) {
@@ -48,7 +49,7 @@ export default function SearchBar(props) {
         multiple
         id="tags-standard"
         options={searchResult}
-        getOptionDisabled={(option) => selectedResult.length >= 5}
+        getOptionDisabled={option => selectedResult.length >= 5}
         onChange={(_, val) => handleTxtChange(_, val)}
         renderOption={(props, option) => (
           <li {...props}>
@@ -63,7 +64,11 @@ export default function SearchBar(props) {
               height="40"
             ></img>
             <div className="details-wrapper">
-              <div className="title">{option.name}</div>
+              <div className="title">
+                {option.type === "track"
+                  ? `${option.name} by ${option.artists[0].name}`
+                  : option.name}
+              </div>
               <div className="type">
                 {option.type[0].toUpperCase() + option.type.slice(1)}
               </div>
@@ -79,13 +84,13 @@ export default function SearchBar(props) {
             />
           ))
         }
-        getOptionLabel={(option) => option.name}
+        getOptionLabel={option => option.name}
         filterSelectedOptions
-        renderInput={(params) => (
+        renderInput={params => (
           <TextField
             className="inputBox"
             {...params}
-            outline='none'
+            outline="none"
             onChange={handleChange}
             placeholder="Enter up to 5 tracks or artists"
             InputLabelProps={{
@@ -93,13 +98,12 @@ export default function SearchBar(props) {
               sx: {
                 color: "#CAD2C5",
                 [`&.${inputLabelClasses.shrink}`]: {
-                  color: "orange"
-                }
-              }
+                  color: "orange",
+                },
+              },
             }}
-            sx={{ 
-              // borderRadius: 5,
-              backgroundColor: 'white'
+            sx={{
+              backgroundColor: "white",
             }}
           />
         )}
@@ -107,16 +111,16 @@ export default function SearchBar(props) {
           width: 4 / 10,
           m: "auto",
           "& .MuiAutocomplete-inputRoot": {
-          "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: "white"
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "white",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "white",
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "white",
+            },
           },
-          "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "white"
-          },
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: "white"
-          }
-  }
         }}
       />
       <SearchButton
